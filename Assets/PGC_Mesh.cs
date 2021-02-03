@@ -9,16 +9,22 @@ public class PGC_Mesh : MonoBehaviour
     private MeshFilter meshFilter;
     private MeshRenderer meshRenderer;
     private MeshCollider meshCollider;
-
-    public Vector3[] newVertices;
+    public Material material;
+    
+    
+    public Vector3[] newVertices, newVerts;
     public Vector2[] newUV;
     public int[] newTriangles;
+
+    private float zVal;
+    public float offSetx;
+    public float offSetz;
 
     private void Awake()
     {
         meshFilter = gameObject.AddComponent<MeshFilter>();
         meshRenderer = gameObject.AddComponent<MeshRenderer>();
-        meshRenderer.material = Resources.Load<Material>("MeshMaterial");
+        meshRenderer.material = material;
         meshCollider = gameObject.AddComponent<MeshCollider>();
     }
 
@@ -33,7 +39,7 @@ public class PGC_Mesh : MonoBehaviour
         
         GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
         cube.AddComponent<Rigidbody>();
-        cube.transform.position = new Vector3(10f, 20f, 5f);
+        cube.transform.position = new Vector3(5f, 20f, 10f);
         CreateShape();
         UpdateMesh();
         GetComponent<MeshCollider>().sharedMesh = mesh;
@@ -42,7 +48,36 @@ public class PGC_Mesh : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        MeshWavePerls(5f, 5f);
+    }
+
+    void MeshWavePerls(float lat, float lon)
+    {
+        mesh = this.gameObject.GetComponent<MeshFilter>().mesh;
+
+        newVerts = new Vector3[(xSize + 1) * (zSize + 1)];
+        float amplitude = 2.0f;
+        float wavelength = 10f;
+
+        for(int i = 0, z = 0; z <= zSize; z++)
+        {
+            for(int x = 0; x <= xSize; x++, i++)
+            {
+                zVal = amplitude * Mathf.Sin((float)(mesh.vertices[i].x * 2 * Mathf.PI / wavelength) + Time.time) * Mathf.Cos((float)(mesh.vertices[i].z * 2 * Mathf.PI / wavelength) + Time.time);
+
+
+                float xCoord = offSetx + 333f * x / xSize * amplitude;
+                float zCoord = offSetz + 222f * z / zSize * amplitude;
+
+                //zVal = zVal + Mathf.PerlinNoise(xCoord, zCoord);
+
+                newVerts[i] = new Vector3(x, zVal + Mathf.PerlinNoise(xCoord, zCoord), z);
+            }
+        }
+        newVertices = newVerts;
+        mesh.vertices = newVerts;
+        mesh.RecalculateNormals();
+        meshCollider.sharedMesh = mesh;
     }
 
     void CreateShape()
