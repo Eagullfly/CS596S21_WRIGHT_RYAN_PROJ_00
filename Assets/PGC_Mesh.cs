@@ -13,7 +13,6 @@ public class PGC_Mesh : MonoBehaviour
     
     
     public Vector3[] newVertices, newVerts;
-    public Vector2[] newUV;
     public int[] newTriangles;
 
     private float zVal;
@@ -35,7 +34,6 @@ public class PGC_Mesh : MonoBehaviour
         GetComponent<MeshFilter>().mesh = mesh;
         mesh.vertices = newVertices;
         mesh.triangles = newTriangles;
-        //GetComponent<MeshCollider>().convex = true;
         
         GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
         cube.AddComponent<Rigidbody>();
@@ -68,8 +66,6 @@ public class PGC_Mesh : MonoBehaviour
 
                 float xCoord = offSetx + 333f * x / xSize * amplitude;
                 float zCoord = offSetz + 222f * z / zSize * amplitude;
-
-                //zVal = zVal + Mathf.PerlinNoise(xCoord, zCoord);
 
                 newVerts[i] = new Vector3(x, zVal + Mathf.PerlinNoise(xCoord, zCoord), z);
             }
